@@ -38,9 +38,11 @@ app.post('/', function(req, res) {
         ]
     };
 
+    console.log(data)
+
     var jsonData = JSON.stringify(data);
 
-    const url = `https://us8.api.mailchimp.com/3.0/lists/${process.env.LIST_ID}/members/`
+    const url = `https://us8.api.mailchimp.com/3.0/lists/${process.env.LIST_ID}`
     console.log(`url ${url}`)
     
     const authKey = `matt1:${process.env.API_KEY}`
@@ -55,24 +57,32 @@ app.post('/', function(req, res) {
     
     const request = https.request(url, options, function(responce) {
 
-        console.log(`request: ${request.url} ${request.options}`)
+        // console.log(`request: ${request.url} ${request.options}`)
         console.log(`status: ${responce.statusCode}`)
 
         responce.on("data", function(data) {
         
-            console.log(JSON.parse(data));
-        
+            try {
+                console.log(JSON.parse(data));
+            } catch (error){
+                console.log('error parsing ', error , data)
+            }
         })
 
         if (responce.statusCode === 200) {
+
             res.sendFile(__dirname + `/success.html`)
+        
         } else {
+        
             res.sendFile(__dirname + `/failure.html`)
+        
         }
     
     })
 
     request.write(jsonData)
+    request.end()
 
 })
 
